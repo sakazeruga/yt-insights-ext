@@ -1,19 +1,15 @@
 // background.js – Service Worker
 'use strict';
 
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-3.5-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // ─── Tab management ───────────────────────────────────────────────────────────
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== 'complete') return;
   if (tab.url?.includes('youtube.com/watch')) {
-    try {
-      await chrome.sidePanel.open({ windowId: tab.windowId });
-    } catch (_) {
-      // panel already open or user dismissed
-    }
+    chrome.storage.local.set({ lastYoutubeTabId: tabId });
   }
 });
 

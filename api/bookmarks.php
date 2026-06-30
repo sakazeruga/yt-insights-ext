@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . '/config.php';
 
 // ─── CORS & 認証 ───────────────────────────────────────────────────────────────
@@ -13,7 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$key = $_SERVER['HTTP_X_API_KEY'] ?? '';
+$key = $_SERVER['HTTP_X_API_KEY']
+     ?? $_SERVER['HTTP_X_Api_Key']
+     ?? getallheaders()['X-Api-Key']
+     ?? '';
 if ($key !== API_KEY) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
@@ -106,8 +111,7 @@ function getList(PDO $pdo): void {
 
     $sql = 'SELECT * FROM bookmarks'
          . ($where ? ' WHERE ' . implode(' AND ', $where) : '')
-         . ' ORDER BY created_at DESC LIMIT ?';
-    $params[] = $limit;
+         . ' ORDER BY created_at DESC LIMIT ' . $limit;
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);

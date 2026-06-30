@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YT Insights — ライブラリ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0c0c14;
+      --surface:     #13131f;
+      --card:        #1a1a2e;
+      --card-hover:  #20203a;
+      --border:      #252540;
+      --border-mid:  #2e2e55;
+      --violet:      #7c6bfd;
+      --violet-d:    #6254e8;
+      --violet-glow: rgba(124,107,253,0.15);
+      --amber:       #f0a830;
+      --amber-bg:    rgba(240,168,48,0.1);
+      --emerald:     #34d399;
+      --emerald-bg:  rgba(52,211,153,0.08);
+      --rose:        #f87171;
+      --sky:         #60c0f8;
+      --text:        #e8e8f0;
+      --text-2:      #8888aa;
+      --text-3:      #5c5c7a;
+      --r:           8px;
+      --r-sm:        5px;
+      --r-pill:      100px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo span { color: var(--violet); }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      max-width: 600px;
+    }
+    .search-wrap { position: relative; flex: 1; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 14px; pointer-events: none; }
+    .search-inp {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      padding: 8px 10px 8px 32px;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .search-inp:focus { border-color: var(--violet); }
+    .search-inp::placeholder { color: var(--text-3); }
+
+    .cat-select {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      padding: 8px 12px;
+    }
+
+    .header-meta { margin-left: auto; color: var(--text-3); font-size: 12px; white-space: nowrap; }
+
+    /* ── Main ── */
+    .main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: border-color 0.15s, transform 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .card:hover { border-color: var(--border-mid); transform: translateY(-2px); }
+
+    .card-thumb {
+      aspect-ratio: 16/9;
+      background: var(--border);
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+    .card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .card-cat {
+      background: var(--amber-bg);
+      border-radius: var(--r-pill);
+      color: var(--amber);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+    }
+    .card-channel { color: var(--text-3); font-size: 11px; }
+    .card-status-done { color: var(--emerald); font-size: 11px; margin-left: auto; }
+    .card-status-pending { color: var(--text-3); font-size: 11px; margin-left: auto; }
+
+    .card-title {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .card-summary {
+      color: var(--text-2);
+      font-size: 12px;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; padding-top: 6px; }
+    .tag {
+      background: var(--violet-glow);
+      border-radius: var(--r-pill);
+      color: var(--violet);
+      font-size: 10px;
+      padding: 2px 7px;
+    }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 32px;
+    }
+    .page-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 7px 16px;
+      transition: background 0.15s;
+    }
+    .page-btn:hover:not(:disabled) { background: var(--card-hover); }
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .page-info { color: var(--text-3); font-size: 12px; }
+
+    /* ── States ── */
+    .state-box {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 80px 20px;
+      text-align: center;
+      color: var(--text-3);
+    }
+    .state-icon { font-size: 40px; }
+    .state-msg { font-size: 14px; }
+
+    .spinner {
+      animation: spin 0.9s linear infinite;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      border-top-color: var(--violet);
+      height: 28px;
+      width: 28px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">◈ YT <span>Insights</span></div>
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-inp" id="search" type="text" placeholder="検索…" autocomplete="off">
+    </div>
+    <select class="cat-select" id="cat">
+      <option value="">すべてのカテゴリ</option>
+      <option>技術</option><option>ビジネス</option><option>教育</option>
+      <option>エンタメ</option><option>投資</option><option>健康</option><option>その他</option>
+    </select>
+  </div>
+  <div class="header-meta" id="meta"></div>
+</header>
+
+<main class="main">
+  <div id="root"></div>
+  <div class="pagination" id="pagination"></div>
+</main>
+
+<script>
+  const PER_PAGE = 20;
+  let allItems = [];
+  let filtered  = [];
+  let page      = 1;
+
+  // さくらAPIのURLとキーはchrome.storage経由ではなく
+  // 拡張機能外のページのため、URLパラメータかlocalStorageから取得
+  const params     = new URLSearchParams(location.search);
+  const API_URL    = params.get('api_url')    || localStorage.getItem('yt_api_url')    || '';
+  const API_KEY    = params.get('api_key')    || localStorage.getItem('yt_api_key')    || '';
+
+  async function load() {
+    render('loading');
+    if (!API_URL || !API_KEY) {
+      render('no-config');
+      return;
+    }
+    try {
+      const res  = await fetch(`${API_URL}?limit=500`, { headers: { 'X-Api-Key': API_KEY } });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'エラー');
+      allItems = json.data || [];
+      applyFilter();
+    } catch (e) {
+      render('error', e.message);
+    }
+  }
+
+  function applyFilter() {
+    const q   = document.getElementById('search').value.trim().toLowerCase();
+    const cat = document.getElementById('cat').value;
+    filtered  = allItems.filter(b => {
+      const matchCat = !cat || b.category === cat;
+      const matchQ   = !q
+        || b.title?.toLowerCase().includes(q)
+        || b.summary?.toLowerCase().includes(q)
+        || b.insights?.toLowerCase().includes(q)
+        || (b.tags     || []).some(t => t.toLowerCase().includes(q))
+        || (b.auto_tags|| []).some(t => t.toLowerCase().includes(q));
+      return matchCat && matchQ;
+    });
+    page = 1;
+    renderCards();
+  }
+
+  function renderCards() {
+    document.getElementById('meta').textContent = `${filtered.length} 件`;
+    const start = (page - 1) * PER_PAGE;
+    const items = filtered.slice(start, start + PER_PAGE);
+
+    const root = document.getElementById('root');
+    if (!items.length) {
+      root.innerHTML = '<div class="state-box"><div class="state-icon">📚</div><div class="state-msg">ブックマークがありません</div></div>';
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    root.innerHTML = `<div class="grid">${items.map(cardHTML).join('')}</div>`;
+    renderPagination();
+  }
+
+  function cardHTML(b) {
+    const tags    = [...(b.tags || []), ...(b.auto_tags || [])].slice(0, 5);
+    const tagHTML = tags.map(t => `<span class="tag">${esc(t)}</span>`).join('');
+    const status  = b.status === 'done'
+      ? `<span class="card-status-done">✓ 分析済</span>`
+      : `<span class="card-status-pending">未分析</span>`;
+    return `
+      <a class="card" href="${esc(b.video_url)}" target="_blank">
+        <img class="card-thumb" src="${esc(b.thumbnail_url || '')}" alt="" loading="lazy">
+        <div class="card-body">
+          <div class="card-meta">
+            ${b.category ? `<span class="card-cat">${esc(b.category)}</span>` : ''}
+            <span class="card-channel">${esc(b.channel_name || '')}</span>
+            ${status}
+          </div>
+          <div class="card-title">${esc(b.title)}</div>
+          ${b.summary ? `<div class="card-summary">${esc(b.summary)}</div>` : ''}
+          ${tagHTML ? `<div class="card-tags">${tagHTML}</div>` : ''}
+        </div>
+      </a>`;
+  }
+
+  function renderPagination() {
+    const total = Math.ceil(filtered.length / PER_PAGE);
+    if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+    document.getElementById('pagination').innerHTML = `
+      <button class="page-btn" id="prev" ${page === 1 ? 'disabled' : ''}>← 前へ</button>
+      <span class="page-info">${page} / ${total}</span>
+      <button class="page-btn" id="next" ${page === total ? 'disabled' : ''}>次へ →</button>`;
+    document.getElementById('prev').onclick = () => { page--; renderCards(); scrollTo(0,0); };
+    document.getElementById('next').onclick = () => { page++; renderCards(); scrollTo(0,0); };
+  }
+
+  function render(state, msg = '') {
+    const root = document.getElementById('root');
+    if (state === 'loading') {
+      root.innerHTML = '<div class="state-box"><div class="spinner"></div></div>';
+    } else if (state === 'no-config') {
+      root.innerHTML = '<div class="state-box"><div class="state-icon">⚙️</div><div class="state-msg">URLパラメータにAPI URLとAPI Keyを指定してください。<br><code>?api_url=...&api_key=...</code></div></div>';
+    } else if (state === 'error') {
+      root.innerHTML = `<div class="state-box"><div class="state-icon">⚠️</div><div class="state-msg">${esc(msg)}</div></div>`;
+    }
+    document.getElementById('pagination').innerHTML = '';
+  }
+
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  let debounce;
+  document.getElementById('search').addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(applyFilter, 250);
+  });
+  document.getElementById('cat').addEventListener('change', applyFilter);
+
+  load();
+</script>
+</body>
+</html>

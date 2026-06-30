@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "description": "YouTube動画をGemini AIで自動分析。要約・キーポイント・タイムスタンプ・知見を抽出してクラウドに保存。",
   "permissions": [
-    "sidePanel",
     "storage",
     "activeTab",
     "tabs"
@@ -24,12 +23,10 @@
       "run_at": "document_idle"
     }
   ],
-  "side_panel": {
-    "default_path": "sidepanel.html"
-  },
   "options_page": "options.html",
   "action": {
     "default_title": "YT Insights",
+    "default_popup": "sidepanel.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
