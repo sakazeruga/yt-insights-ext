@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>YT Insights – 設定</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c14; --surface: #13131f; --card: #1a1a2e;
+      --border: #252540; --violet: #7c6bfd; --violet-d: #6254e8;
+      --amber: #f0a830; --emerald: #34d399; --rose: #f87171;
+      --text: #e8e8f0; --text-2: #8888aa; --text-3: #5c5c7a;
+      --r: 8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+
+    .wrap { max-width: 580px; margin: 0 auto; }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .page-sub { color: var(--text-2); font-size: 12px; margin-bottom: 32px; }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .section-head {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px 12px;
+    }
+    .section-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .section-desc { color: var(--text-2); font-size: 12px; line-height: 1.5; }
+    .section-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+
+    label { display: block; color: var(--text-2); font-size: 10px; font-weight: 700; letter-spacing: 0.8px; margin-bottom: 5px; text-transform: uppercase; }
+
+    input[type=text], input[type=password] {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      outline: none;
+      padding: 8px 10px;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    input:focus { border-color: var(--violet); }
+    input::placeholder { color: var(--text-3); }
+
+    .code-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-2);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      line-height: 1.7;
+      overflow-x: auto;
+      padding: 12px 14px;
+      white-space: pre;
+    }
+
+    .link { color: var(--violet); text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+
+    .note {
+      background: rgba(240,168,48,0.07);
+      border: 1px solid rgba(240,168,48,0.2);
+      border-radius: 6px;
+      color: var(--amber);
+      font-size: 11px;
+      padding: 8px 12px;
+    }
+
+    .footer {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn-save {
+      background: var(--violet);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 28px;
+      transition: background 0.15s;
+    }
+    .btn-save:hover { background: var(--violet-d); }
+
+    .save-status {
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .save-status.show { opacity: 1; }
+    .save-status.ok  { color: var(--emerald); }
+    .save-status.err { color: var(--rose); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <p class="page-title">◈ YT Insights — 設定</p>
+  <p class="page-sub">Gemini APIキーとSupabaseの設定を行うことで、AI分析とクラウド保存が有効になります。</p>
+
+  <!-- Gemini -->
+  <div class="section">
+    <div class="section-head">
+      <p class="section-title">🤖 Gemini API</p>
+      <p class="section-desc">
+        動画の自動分析（要約・キーポイント・タイムスタンプ・知見の抽出）に使用します。<br>
+        <a class="link" href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+        で無料のAPIキーを取得してください。使用モデル: <code>gemini-2.0-flash</code>
+      </p>
+    </div>
+    <div class="section-body">
+      <div>
+        <label>Gemini API Key</label>
+        <input type="password" id="geminiApiKey" placeholder="AIzaSy…">
+      </div>
+    </div>
+  </div>
+
+  <!-- さくら -->
+  <div class="section">
+    <div class="section-head">
+      <p class="section-title">🌸 さくらのレンタルサーバー（クラウドストレージ）</p>
+      <p class="section-desc">
+        ブックマークと分析結果をさくらのMySQLに保存します。<br>
+        FTPで <code>api/</code> フォルダをアップロードし、phpMyAdminで <code>api/schema.sql</code> を実行してください。
+      </p>
+    </div>
+    <div class="section-body">
+      <div>
+        <label>API URL</label>
+        <input type="text" id="sakuraApiUrl" placeholder="https://yourdomain.sakura.ne.jp/api/bookmarks.php">
+        <p style="color:var(--text-3);font-size:10px;margin-top:4px;">FTPでアップロードしたbookmarks.phpのURL</p>
+      </div>
+      <div>
+        <label>API Key（自分で決めた秘密キー）</label>
+        <input type="password" id="sakuraApiKey" placeholder="your-secret-api-key-here">
+        <p style="color:var(--text-3);font-size:10px;margin-top:4px;">api/config.php の API_KEY と同じ値を入力</p>
+      </div>
+      <div class="note">
+        ⚠ 未設定の場合、ブックマークはブラウザローカルストレージに保存されます（他端末間での共有不可）。
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="btn-save" id="btn-save">保存する</button>
+    <span class="save-status" id="save-status"></span>
+  </div>
+</div>
+<script src="options.js"></script>
+</body>
+</html>

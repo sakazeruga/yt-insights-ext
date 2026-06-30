@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YT Insights</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Header ── -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-mark">◈</span>
+        <span class="logo-name">YT Insights</span>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-tab="current">現在の動画</button>
+        <button class="tab" data-tab="library">ライブラリ</button>
+      </nav>
+    </header>
+
+    <!-- ═══════════════════════════ TAB: current ════════════════════════════ -->
+    <div id="tab-current" class="tab-pane active">
+
+      <!-- empty: no video detected -->
+      <div id="no-video" class="blank-slate">
+        <div class="blank-icon">▶</div>
+        <p class="blank-title">YouTube動画を開いてください</p>
+        <p class="blank-sub">動画ページを開くとここに表示されます</p>
+      </div>
+
+      <!-- video detected -->
+      <div id="video-panel" class="hidden">
+
+        <!-- Video meta card -->
+        <div class="video-card">
+          <img id="vid-thumb" class="vid-thumb" src="" alt="" loading="lazy">
+          <div class="vid-info">
+            <p id="vid-title" class="vid-title"></p>
+            <p id="vid-channel" class="vid-channel"></p>
+            <p id="vid-duration" class="vid-duration"></p>
+          </div>
+        </div>
+
+        <!-- Already-bookmarked banner -->
+        <div id="bm-banner" class="bm-banner hidden">
+          <span class="bm-banner-icon">✦</span>
+          <span class="bm-banner-label">ブックマーク済み</span>
+          <button id="btn-remove" class="btn-ghost-danger">削除</button>
+        </div>
+
+        <!-- ── Bookmark form (pre-save) ── -->
+        <div id="bm-form" class="form-block">
+          <div class="field">
+            <label class="field-label">タグ</label>
+            <div class="tag-field" id="tag-field">
+              <div id="tags-row" class="tags-row"></div>
+              <input id="tag-inp" class="tag-inp" type="text" placeholder="タグを入力してEnter">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">メモ</label>
+            <textarea id="notes-inp" class="notes-inp" rows="3" placeholder="個人的なメモ…"></textarea>
+          </div>
+
+          <button id="btn-save" class="btn-primary">
+            <span>◈</span> ブックマーク＋AI分析
+          </button>
+        </div>
+
+        <!-- ── Analysis area ── -->
+        <div id="analysis-area" class="analysis-area hidden">
+
+          <div id="analysis-loading" class="analysis-loading hidden">
+            <div class="pulse-ring"></div>
+            <p>Geminiが動画を解析中…</p>
+          </div>
+
+          <div id="analysis-error" class="analysis-error hidden">
+            <p id="analysis-error-msg"></p>
+            <button id="btn-retry" class="btn-secondary">再試行</button>
+          </div>
+
+          <div id="analysis-done" class="hidden">
+
+            <div class="insight-card card-summary">
+              <div class="card-eyebrow">要約</div>
+              <p id="a-summary" class="card-body"></p>
+            </div>
+
+            <div class="insight-card card-keypoints">
+              <div class="card-eyebrow">キーポイント</div>
+              <ul id="a-keypoints" class="kp-list"></ul>
+            </div>
+
+            <div class="insight-card card-timestamps">
+              <div class="card-eyebrow">重要タイムスタンプ</div>
+              <div id="a-timestamps" class="ts-list"></div>
+            </div>
+
+            <div class="insight-card card-insights">
+              <div class="card-eyebrow">知見・アクション</div>
+              <p id="a-insights" class="card-body insights-body"></p>
+            </div>
+
+            <div class="insight-card card-tags">
+              <div class="card-eyebrow">AI自動タグ</div>
+              <div id="a-autotags" class="autotags-row"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════ TAB: library ═══════════════════════════ -->
+    <div id="tab-library" class="tab-pane hidden">
+
+      <div class="lib-controls">
+        <div class="search-box">
+          <span class="search-icon">⌕</span>
+          <input id="lib-search" class="lib-search" type="text" placeholder="検索…">
+        </div>
+        <div class="filter-row">
+          <select id="cat-filter" class="cat-filter">
+            <option value="">すべてのカテゴリ</option>
+            <option>技術</option>
+            <option>ビジネス</option>
+            <option>教育</option>
+            <option>エンタメ</option>
+            <option>投資</option>
+            <option>健康</option>
+            <option>その他</option>
+          </select>
+          <button id="btn-refresh" class="btn-icon" title="更新">↺</button>
+        </div>
+        <div id="lib-count" class="lib-count"></div>
+      </div>
+
+      <div id="bm-list" class="bm-list">
+        <div class="list-loading"><div class="spinner"></div></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
